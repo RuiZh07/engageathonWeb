@@ -3,20 +3,13 @@ import {
     StyleSheet,
     Text,
     View,
-    ScrollView,
-    Animated,
     Dimensions,
     Image,
     TouchableOpacity,
-    Platform
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from '@react-navigation/native';
 
-const { width, height } = Dimensions.get("window");
-
 const images = [
-    require("../assets/splashScreens/onboarding.png"),
     require("../assets/splashScreens/onboarding_1.png"),
     require("../assets/splashScreens/onboarding_2.png"),
     require("../assets/splashScreens/onboarding_3.png"),
@@ -38,15 +31,25 @@ export default function ImageSlider() {
         } else {
             handleGetStartedButton();
         }
-    }
-
-    //console.log("Current Index: ", currentIndex);
+    };
 
     return (
         <View style={styles.mainBackgroundColor}>
             <View style={styles.container}>
                 <View style={styles.cardContainer}>
                     <Image source={images[currentIndex]} style={styles.card} resizeMode="cover" />
+                </View>
+
+                <View style={styles.indicator}>
+                    {images.map((_, index) => (
+                        <View 
+                            key={index} 
+                            style={[
+                                styles.dot, 
+                                currentIndex === index ? styles.activeDot : styles.inactiveDot
+                            ]}
+                        />
+                    ))}
                 </View>
 
                 <View style={styles.buttonContainer}>
@@ -65,20 +68,9 @@ export default function ImageSlider() {
                             <Text style={styles.getStartedButtonText}>Let's Begin</Text>
                         </TouchableOpacity>
                     )}
-                </View>
-                    {/*
-                <View style={styles.indicator}>
-                    {images.map((_, index) => (
-                        <view key={index} style={[styles.dot, currentIndex == index && styles.activeDot]} />
-                    ))}
-                </View>
-
-                */}
-                
-                
+                </View>               
             </View>
         </View>
-
     );
 }
 
@@ -101,7 +93,7 @@ const styles = StyleSheet.create({
     indicator: {
         flexDirection: "row",
         position: "absolute",
-        bottom: 20,
+        bottom: 80,
         alignSelf: "center",
     },
     dot: {
@@ -112,46 +104,46 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
         //overflow: "hidden",
     },
+    inactiveDot: {
+        backgroundColor: "#fff", 
+    },
     activeDot: {
-        height: 10,
-        width: 10,
-        backgroundColor: "#2BAB47",
-        position: "absolute",
+        backgroundColor: "#FF8D00",
     },
     buttonContainer: {
-        bottom: 40,
+        bottom: 60,
         postition: "absolute",
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        paddingHorizontal: 20,
+        paddingHorizontal: 25,
     },
     skipButton: {
 
     },
     skipButtonText: {
+        fontFamily: 'Poppins',
         color: "#FFFFFF",
-        fontSize: 18,
-        fontWeight: "400",
+        fontSize: 20,
+        fontWeight: 400,
     },
     getStartedButton: {
-        //alignItems: "center",
-        //justifyContent: "flex-end",
-       // width: 107,
-        //height: 28,
-       // borderRadius: 30,
-       alignSelf: 'flex-end',
+        position: 'absolute',
+        right: 20,
+        bottom: -20,
     },
     getStartedButtonText: {
-        color: "#FFFFFF",
-        fontSize: 18,
-        fontWeight: "400",
+        fontFamily: 'Poppins',
+        color: "#FF8D00",
+        fontSize: 20,
+        fontWeight: 400,
     },
     nextButton: {
     },
     nextButtonText: {
-        fontSize: 18,
-        fontWeight: "400",
+        fontFamily: 'Poppins',
+        fontSize: 20,
+        fontWeight: 400,
         color: "#FFFFFF",
     }
 });

@@ -3,8 +3,6 @@ import { StyleSheet, ImageBackground, View, Image, Text, TextInput, Alert } from
 import MainButton from '../components/MainButton';
 import IconTitle from '../components/IconTitle';
 import { LinearGradient } from "expo-linear-gradient";
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { SvgUri } from "react-native-svg";
 import { useNavigation } from '@react-navigation/native';
 import { MdMailOutline } from "react-icons/md";
 import { MdOutlinePersonOutline } from "react-icons/md";
@@ -14,6 +12,7 @@ export default function UserForm() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const navigation = useNavigation();
 
     const isValidEmail = (email) => {
@@ -23,12 +22,12 @@ export default function UserForm() {
 
     const handleContinue = async () => {
         if (!firstName || !lastName || !email) {
-            Alert.alert('Error', 'All fields are required.');
+            setErrorMessage('All fields are required.');
             return;
         }
 
         if (!isValidEmail(email)) {
-            Alert.alert('Error', 'Please enter a valid email.');
+            setErrorMessage('Please enter a valid email.');
             return;
         }
 
@@ -82,64 +81,69 @@ export default function UserForm() {
 
                 <View style={styles.inputContainer}>
                 <LinearGradient
-                        colors={['rgba(255, 141, 0, 0.3)', 'rgba(255, 222, 26, 0.3)']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.gradientBackground}
-                    >
-                        <View style={styles.userInputContainer}>
-                            <MdOutlinePersonOutline size={30} color="#CBCBCB" style={styles.iconPosition} />
-                            <TextInput
-                                style={styles.userInput}
-                                placeholder="First Name"
-                                placeholderTextColor='#CBCBCB'
-                                value={firstName}
-                                onChangeText={setFirstName}
-                            />
-                        </View>
-                    </LinearGradient>
+                    colors={['rgba(255, 141, 0, 0.3)', 'rgba(255, 222, 26, 0.3)']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.gradientBackground}
+                >
+                    <View style={styles.userInputContainer}>
+                        <MdOutlinePersonOutline size={30} color="#CBCBCB" style={styles.iconPosition} />
+                        <TextInput
+                            style={styles.userInput}
+                            placeholder="First Name"
+                            placeholderTextColor='#CBCBCB'
+                            value={firstName}
+                            onChangeText={setFirstName}
+                        />
+                    </View>
+                </LinearGradient>
 
-                    <LinearGradient
-                        colors={['rgba(255, 141, 0, 0.3)', 'rgba(255, 222, 26, 0.3)']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.gradientBackground}
-                    >
-                        <View style={styles.userInputContainer}>
-                            <MdOutlinePersonOutline size={30} color="#CBCBCB" style={styles.iconPosition} />
-                            <TextInput
-                                style={styles.userInput}
-                                placeholder="Last Name"
-                                placeholderTextColor='#CBCBCB'
-                                value={lastName}
-                                onChangeText={setLastName}
-                            />
-                        </View>
-                    </LinearGradient>
+                <LinearGradient
+                    colors={['rgba(255, 141, 0, 0.3)', 'rgba(255, 222, 26, 0.3)']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.gradientBackground}
+                >
+                    <View style={styles.userInputContainer}>
+                        <MdOutlinePersonOutline size={30} color="#CBCBCB" style={styles.iconPosition} />
+                        <TextInput
+                            style={styles.userInput}
+                            placeholder="Last Name"
+                            placeholderTextColor='#CBCBCB'
+                            value={lastName}
+                            onChangeText={setLastName}
+                        />
+                    </View>
+                </LinearGradient>
 
-                    <LinearGradient
-                        colors={['rgba(255, 141, 0, 0.3)', 'rgba(255, 222, 26, 0.3)']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.gradientBackground}
-                    >
-                        <View style={styles.userInputContainer}>                       
-                            <MdMailOutline size={30} color="#CBCBCB" style={styles.iconPosition} />
-                            <TextInput
-                                style={styles.userInput}
-                                placeholder="Email"
-                                placeholderTextColor='#CBCBCB'
-                                value={email}
-                                onChangeText={setEmail}
-                            />
-                        </View>
-                    </LinearGradient>
+                <LinearGradient
+                    colors={['rgba(255, 141, 0, 0.3)', 'rgba(255, 222, 26, 0.3)']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.gradientBackground}
+                >
+                    <View style={styles.userInputContainer}>                       
+                        <MdMailOutline size={30} color="#CBCBCB" style={styles.iconPosition} />
+                        <TextInput
+                            style={styles.userInput}
+                            placeholder="Email"
+                            placeholderTextColor='#CBCBCB'
+                            value={email}
+                            onChangeText={setEmail}
+                        />
+                    </View>
+                </LinearGradient>
+            </View>
 
+            <View style={styles.buttonContainer}>
+                <MainButton title="Continue" onPress={handleContinue} />
+            </View>
+
+            {errorMessage ? (
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{errorMessage}</Text>
                 </View>
-
-                <View style={styles.buttonContainer}>
-                    <MainButton title="Continue" onPress={handleContinue} />
-                </View>
+            ) : null}
         </View>
     );
 }
@@ -187,8 +191,18 @@ const styles = StyleSheet.create({
         marginLeft: 20,
     },
     buttonContainer: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        marginBottom: 150,
+        marginTop: 100,
     }, 
+    errorContainer: {
+        padding: 15,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 10,
+        marginTop: 30,
+        marginHorizontal: 20,
+    },
+    errorText: {
+        color: '#D8000C',
+        fontSize: 16,
+        textAlign: 'center',
+    },
 })

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, 
     ImageBackground, 
     View, 
-    Image, 
     Text, 
     TouchableOpacity, 
     TextInput, 
@@ -17,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function Login () {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const navigation = useNavigation();
     
     const isValidEmail = (email) => {
@@ -26,12 +26,12 @@ export default function Login () {
 
     const loginUser = async (email, password) => {
         if (!email || !password) {
-            Alert.alert('Error', 'Please enter both email and password.');
+            setErrorMessage('Please enter both email and password.');
             return;
         }
 
         if (!isValidEmail(email)) {
-            Alert.alert('Error', 'Please enter a valid email.');
+            setErrorMessage('Please enter a valid email.');
             return;
         }
 
@@ -45,12 +45,11 @@ export default function Login () {
             });
 
             const result = await response.json();
-            console.log('Login result:', result);
+            //console.log('Login result:', result);
 
             if (response.ok) {
                 const { token, email, first_name, last_name } = result;
-
-                console.log('Login results:', result);
+                //console.log('Login results:', result);
 
                 const userData = {
                     token,
@@ -62,10 +61,10 @@ export default function Login () {
                 await AsyncStorage.setItem('userData', JSON.stringify(userData));
                 navigation.navigate('ActivityScreen');
             } else {
-                Alert.alert('Login Error', result.message || 'Invalid login credentials. Please try again.');
+                Alert.alert(result.message || 'Invalid login credentials. Please try again.');
             }
         } catch (error) {
-            Alert.alert('Error', 'An error occurred. Please check your network connection.');
+            Alert.alert('An error occurred. Please check your network connection.');
         }
     };
 
@@ -81,13 +80,12 @@ export default function Login () {
             />
              <View style={styles.scrollContent}>
                 <IconTitle />
-
                 <View style={styles.loginContainer}>
                     <Text style={styles.loginText}>Login</Text>
                     <Text style={styles.subHeading}>Please login to continue</Text>
 
                     <View style={styles.emailContainer}>
-                        <MdPersonOutline size={24} color="#ABABAB" />
+                        <MdPersonOutline size={24} color="#ABABAB" style={styles.iconPosition} />
                         <TextInput
                             value={email}
                             onChangeText={setEmail} 
@@ -98,7 +96,7 @@ export default function Login () {
                     </View>
 
                     <View style={styles.passwordContainer}>
-                        <FiLock size={20} color="#ABABAB" />
+                        <FiLock size={20} color="#ABABAB" style={styles.iconPosition}/>
                         <TextInput 
                             value={password}
                             onChangeText={setPassword}
@@ -123,6 +121,12 @@ export default function Login () {
                         </TouchableOpacity>
                     </View>
                     
+                    {errorMessage ? (
+                        <View style={styles.errorContainer}>
+                            <Text style={styles.errorText}>{errorMessage}</Text>
+                        </View>
+                    ) : null}
+
                 </View>
             </View>   
         </View>
@@ -167,11 +171,13 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#D6D6D6',
         borderRadius: 10,
-        padding: 20,
+        //padding: 20,
         marginBottom: 20,
     },
     enterEmail: {
+        flex: 1,
         paddingLeft: 10,
+        padding: 20,
         fontSize: 18,
         color: "#ABABAB",
     },
@@ -180,12 +186,18 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#D6D6D6',
         borderRadius: 10,
-        padding: 20,
+        //padding: 20,
     },
     enterPassword: {
+        flex: 1,
+        padding: 20,
         paddingLeft: 10,
         fontSize: 18,
         color: "#ABABAB",
+    },
+    iconPosition:{
+        marginLeft: 20,
+        marginTop: 20,
     },
     forgotPassword: {
         paddingTop: 10,
@@ -214,6 +226,17 @@ const styles = StyleSheet.create({
     signUpText: {
         fontSize: 16,
         color: '#FFDE1A'
+    },
+    errorContainer: {
+        padding: 15,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 10,
+        marginTop: 20,
+    },
+    errorText: {
+        color: '#D8000C',
+        fontSize: 16,
+        textAlign: 'center',
     },
 
 })

@@ -106,27 +106,18 @@ export default function ActivityScreen ({ route }) {
 
     const handleActivityPress = (activity) => {
         if (!activity.confirmed) {
+            //navigation.navigate('CameraComponent')
+            
             navigation.navigate('CongratsScreen', {
                 activityId: activity.id,
                 // badgeName: activity.badgeName,
             });
+            
         } else {
-            // Optionally show a message or perform other actions if the activity is already confirmed
             Alert.alert('Already Completed', 'This activity has already been completed.');
         }
     };
 
-    const handleQRCodeScanned = () => {
-        setCameraVisible(false); 
-        const completedActivity = activities.find(activity => activity.id === completedActivityId);
-        if (completedActivity) {
-            navigation.navigate('CongratsScreen', {
-                activityId: completedActivity.id,
-                badgeName: completedActivity.badgeName,
-            });
-        }
-    };
- 
     return (
         <View style={styles.container}>
             <ImageBackground
@@ -161,18 +152,19 @@ export default function ActivityScreen ({ route }) {
                                     {activity.activity_name === "Photo at LED Screen" && <MdScreenshotMonitor size={22} color="#000000" />}
                                     {activity.activity_name === "Say Hi to the DJ" && <IoMdMusicalNote size={22} color="#000000" />}
                                 </LinearGradient>
+
                                 {activity.confirmed ? (
                                     <TbRosetteDiscountCheckFilled size={28} color="#32a852" style={styles.arrowIcon} />
                                 ) : (
                                     <FaArrowRight size={20} color="#FFFFFF" style={styles.arrowIcon} />
                                 )}
-
                             </View>
                             <Text style={styles.activityNameText}>{activity.activity_name}</Text>
                             <Text style={styles.pointText}>{activity.activity_points} Points</Text>
                         </TouchableOpacity>
                     ))}
                 </View>   
+
                 <Text style={styles.rewardsEarnedText}>Rewards Earned</Text> 
                 <View style={styles.rewardArea}>  
                     <View style={styles.rewardsContainer}>
@@ -184,7 +176,8 @@ export default function ActivityScreen ({ route }) {
                             <Text style={styles.getPoints}>{totalPoints}</Text>
                             <Text style={styles.totalPoint}>of {totalPossiblePoints} Points</Text>
                         </View>
-                    </View>     
+                    </View> 
+                        
                     <View style={styles.rewardsContainer}>
                         <Image 
                             source={require('../../assets/prizes/prize.png')} 
@@ -197,6 +190,7 @@ export default function ActivityScreen ({ route }) {
                     </View>      
                 </View>  
             </View>
+
             <Modal 
                 visible={isModalVisible} 
                 transparent={true}

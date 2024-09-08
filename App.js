@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -10,7 +9,7 @@ import ActivityScreen from './src/screens/ActivityScreen';
 import Login from "./src/screens/Login";
 import CongratsScreen from './src/screens/CongratsScreen';
 import CollectRewardsScreen from './src/screens/CollectRewardsScreen';
-
+import CameraComponent from './src/components/CameraComponent';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -24,6 +23,8 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
         <Stack.Screen name="CongratsScreen" component={CongratsScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="CollectRewardsScreen" component={CollectRewardsScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="CameraComponent" component={CameraComponent} options={{ headerShown: false }}/>
+        
       </Stack.Navigator>
     </NavigationContainer>
   );
