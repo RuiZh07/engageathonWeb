@@ -14,6 +14,7 @@ import MainButton from '../components/MainButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ActivityScreen ({ route }) {
+    const [userName, setUserName] = useState('');
     const [activities, setActivities] = useState([])
     const [camerVisible, setCameraVisible] = useState(false);
     const [completedActivityId, setCompletedActivityId] = useState(null);
@@ -23,6 +24,22 @@ export default function ActivityScreen ({ route }) {
     const [totalPossiblePoints, setTotalPossiblePoints] = useState(0);
     const [isModalVisible, setModalVisible] = useState(false);
     const navigation = useNavigation();
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userData = await AsyncStorage.getItem('userData');
+                if (userData) {
+                    const { first_name } = JSON.parse(userData);
+                    setUserName(first_name);
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
 
     useEffect(() => {
         const fetchActivities = async () => {
@@ -52,7 +69,7 @@ export default function ActivityScreen ({ route }) {
         };
         fetchActivities();
     }, [])
-    */}
+
     useEffect(() => {
         if (route.params && route.params.completedActivityId) {
             setCompletedActivityId(route.params.completedActivityId);
