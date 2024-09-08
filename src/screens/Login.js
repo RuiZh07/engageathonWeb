@@ -1,23 +1,85 @@
-import React from 'react';
-import { StyleSheet, ImageBackground, View, Image, Text, TouchableOpacity, TextInput } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, 
+    ImageBackground, 
+    View, 
+    Image, 
+    Text, 
+    TouchableOpacity, 
+    TextInput, 
+    Alert } from 'react-native';
 import MainButton from '../components/MainButton';
 import { useNavigation } from '@react-navigation/native';
 import IconTitle from '../components/IconTitle';
 import { FiLock } from "react-icons/fi";
 import { MdPersonOutline } from "react-icons/md";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function WelcomeScreen () {
+export default function Login () {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const navigation = useNavigation();
+    
+    const isValidEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
 
-    const handlePress = () => {
-        navigation.navigate('ActivityScreen');
+    const loginUser = async (email, password) => {
+        if (!email || !password) {
+            Alert.alert('Error', 'Please enter both email and password.');
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            Alert.alert('Error', 'Please enter a valid email.');
+            return;
+        }
+
+        try {
+            const response = await fetch("http://app.engageathon.com/api/auth/login/temp/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const result = await response.json();
+            console.log('Login result:', result);
+
+            if (response.ok) {
+                const { token, email, first_name, last_name } = result;
+
+                console.log('Login results:', result);
+
+                const userData = {
+                    token,
+                    email,
+                    first_name,
+                    last_name,
+                };
+                await AsyncStorage.setItem('authToken', token);
+                await AsyncStorage.setItem('userData', JSON.stringify(userData));
+                navigation.navigate('ActivityScreen');
+            } else {
+                Alert.alert('Login Error', result.message || 'Invalid login credentials. Please try again.');
+            }
+        } catch (error) {
+            Alert.alert('Error', 'An error occurred. Please check your network connection.');
+        }
+    };
+
+    const handleSignUp = () => {
+        navigation.navigate('UserForm');
     }
     return (
+
         <View style={styles.container}>
             <ImageBackground
                 source={require("../../assets/backgroundImage.png")}
                 style={{ width: "100%", height: "100%", position: "absolute" }}
             />
+             <View style={styles.scrollContent}>
                 <IconTitle />
 
                 <View style={styles.loginContainer}>
@@ -26,7 +88,9 @@ export default function WelcomeScreen () {
 
                     <View style={styles.emailContainer}>
                         <MdPersonOutline size={24} color="#ABABAB" />
-                        <TextInput 
+                        <TextInput
+                            value={email}
+                            onChangeText={setEmail} 
                             style={styles.enterEmail}
                             placeholder="Enter Phone or Email" 
                         />
@@ -36,6 +100,9 @@ export default function WelcomeScreen () {
                     <View style={styles.passwordContainer}>
                         <FiLock size={20} color="#ABABAB" />
                         <TextInput 
+                            value={password}
+                            onChangeText={setPassword}
+                            //secureTextEntry
                             style={styles.enterPassword}
                             placeholder="Enter Password" 
                         />
@@ -46,18 +113,18 @@ export default function WelcomeScreen () {
                     </TouchableOpacity>
 
                     <View style={styles.buttonContainer}>
-                        <MainButton title="Login" onPress={handlePress} />
+                        <MainButton title="Login" onPress={() => loginUser(email, password)} />
                     </View>
 
                     <View style={styles.signUpContainer}>
                         <Text style={styles.accountText}>Don't have an account? </Text>
-                        <TouchableOpacity styles={styles.signUp}>
+                        <TouchableOpacity styles={styles.signUp} onPress={handleSignUp}>
                             <Text style={styles.signUpText}>Sign up</Text>
                         </TouchableOpacity>
                     </View>
                     
                 </View>
-                
+            </View>   
         </View>
     );
 }
@@ -65,6 +132,11 @@ export default function WelcomeScreen () {
 const styles = StyleSheet.create({
     container:{
         flex: 1,
+    },
+    scrollContent: {
+        height: '100vh',
+        overflowY: 'scroll',
+        paddingBottom: 0,
     },
     loginContainer: {
         flex: 1,

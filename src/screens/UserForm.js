@@ -1,18 +1,73 @@
-import React from 'react';
-import { StyleSheet, ImageBackground, View, Image, Text, TextInput } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, ImageBackground, View, Image, Text, TextInput, Alert } from 'react-native';
 import MainButton from '../components/MainButton';
 import IconTitle from '../components/IconTitle';
 import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { SvgUri } from "react-native-svg";
 import { useNavigation } from '@react-navigation/native';
+import { MdMailOutline } from "react-icons/md";
+import { MdOutlinePersonOutline } from "react-icons/md";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function UserForm() {
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
     const navigation = useNavigation();
 
-    const handleContinue = () => {
-        navigation.navigate('ActivityScreen');
-    }
+    const isValidEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const handleContinue = async () => {
+        if (!firstName || !lastName || !email) {
+            Alert.alert('Error', 'All fields are required.');
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            Alert.alert('Error', 'Please enter a valid email.');
+            return;
+        }
+
+        try {
+            const response = await fetch("http://app.engageathon.com/api/auth/privateregiser/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    first_name: firstName,
+                    last_name: lastName,
+                    email: email,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                const userData = {
+                    token: result.token,
+                    email: result.email,
+                    first_name: result.first_name,
+                    last_name: result.last_name,
+                };
+
+                await AsyncStorage.setItem('userData', JSON.stringify(userData));
+
+                console.log('Sign up successful:', result);
+                navigation.navigate('ActivityScreen');
+
+            } else {
+                Alert.alert('Error', result.message || 'Failed to register. Please try again.');
+            }
+        } catch (error) {
+            Alert.alert('Error', 'An error occurred. Please check your network connection.');
+        }
+    };
+
     return (
         <View style={styles.container}>
             <ImageBackground
@@ -33,10 +88,13 @@ export default function UserForm() {
                         style={styles.gradientBackground}
                     >
                         <View style={styles.userInputContainer}>
+                            <MdOutlinePersonOutline size={30} color="#CBCBCB" style={styles.iconPosition} />
                             <TextInput
                                 style={styles.userInput}
                                 placeholder="First Name"
                                 placeholderTextColor='#CBCBCB'
+                                value={firstName}
+                                onChangeText={setFirstName}
                             />
                         </View>
                     </LinearGradient>
@@ -48,10 +106,13 @@ export default function UserForm() {
                         style={styles.gradientBackground}
                     >
                         <View style={styles.userInputContainer}>
+                            <MdOutlinePersonOutline size={30} color="#CBCBCB" style={styles.iconPosition} />
                             <TextInput
                                 style={styles.userInput}
                                 placeholder="Last Name"
                                 placeholderTextColor='#CBCBCB'
+                                value={lastName}
+                                onChangeText={setLastName}
                             />
                         </View>
                     </LinearGradient>
@@ -63,11 +124,13 @@ export default function UserForm() {
                         style={styles.gradientBackground}
                     >
                         <View style={styles.userInputContainer}>                       
-                            {/*<Ionicons name="person-outline" size={24} color="#ABABAB" style={{ marginLeft: 24}}/>*/}
+                            <MdMailOutline size={30} color="#CBCBCB" style={styles.iconPosition} />
                             <TextInput
                                 style={styles.userInput}
                                 placeholder="Email"
                                 placeholderTextColor='#CBCBCB'
+                                value={email}
+                                onChangeText={setEmail}
                             />
                         </View>
                     </LinearGradient>
@@ -77,7 +140,6 @@ export default function UserForm() {
                 <View style={styles.buttonContainer}>
                     <MainButton title="Continue" onPress={handleContinue} />
                 </View>
-                
         </View>
     );
 }
@@ -116,17 +178,13 @@ const styles = StyleSheet.create({
     },
     userInput: {
         flex: 1,
-        paddingLeft: 24,
-        paddingVertical: 18,
-        fontSize: 16,
-        color: '#CBCBCB',
-    },
-    emailInput: {
-        flex: 1,
         paddingLeft: 10,
         paddingVertical: 18,
-        fontSize: 16,
+        fontSize: 20,
         color: '#CBCBCB',
+    },
+    iconPosition:{
+        marginLeft: 20,
     },
     buttonContainer: {
         flex: 1,

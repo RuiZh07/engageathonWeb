@@ -2,7 +2,7 @@ import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_BASE_URL_LOGIN = "https://app.engageathon.com/api/auth/login/";
-const API_BASE_URL_REGISTER = "https://app.engageathon.com/api/auth/register/";
+const API_BASE_URL_REGISTER = "https://app.engageathon.com/api/auth/privateregiser/";
 const API_BASE_URL_INVITE = "https://app.engageathon.com/api/auth/invite/";
 const API_BASE_URL_PASSWORD_RESET = "https://app.engageathon.com/api/auth/password/reset/email/";
 
@@ -43,13 +43,11 @@ const login = async (email, password) => {
   }
 };
 
-const signup = async (accountType, email, firstName, lastName, password) => {
+const signup = async (email, firstName, lastName) => {
   const data = {
-    account_type: accountType,
     email,
     first_name: firstName,
     last_name: lastName,
-    password,
   };
 
   try {
@@ -59,16 +57,14 @@ const signup = async (accountType, email, firstName, lastName, password) => {
       },
     });
 
-    const { account_type, email } = response.data;
+    const { email } = response.data;
 
     console.log("User Data:", {
-      accountType: account_type,
       email,
     });
 
     return {
       userData: {
-        accountType: account_type,
         email,
       },
     };
@@ -78,27 +74,6 @@ const signup = async (accountType, email, firstName, lastName, password) => {
   }
 };
 
-const invite = async (user_email, invitee_email) => {
-  const data = {
-    user_email,
-    invitee_email,
-  };
-
-  try {
-    const response = await axios.post(`${API_BASE_URL_INVITE}`, data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    console.log("Invite Response:", response.data);
-
-    return response.data;
-  } catch (error) {
-    console.error("Invite failed:", error.message);
-    throw error;
-  }
-};
 
 const resetPassword = async (user_email) => {
   const data = {

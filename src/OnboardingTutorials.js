@@ -40,7 +40,7 @@ export default function ImageSlider() {
         }
     }
 
-    console.log("Current Index: ", currentIndex);
+    //console.log("Current Index: ", currentIndex);
 
     return (
         <View style={styles.mainBackgroundColor}>

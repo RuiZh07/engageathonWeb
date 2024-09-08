@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ImageBackground, View, Image, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, ImageBackground, View, Image, Text, TouchableOpacity, Modal, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { PiHamburgerBold } from "react-icons/pi";
 import { FaArrowRight } from "react-icons/fa6";
@@ -10,33 +10,59 @@ import { LinearGradient } from "expo-linear-gradient";
 import { TbRosetteDiscountCheckFilled } from "react-icons/tb";
 import { TiStarburstOutline } from "react-icons/ti";
 import { MdScreenshotMonitor } from "react-icons/md";
+import MainButton from '../components/MainButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const activities = [
-    { id: 1, name: "Beverage Station", points: 30, badgeName: "Beverage Connoisseur", icon: <MdOutlineWineBar size={22} color="#000000" /> },
-    { id: 2, name: "Food Station", points: 30, badgeName: "Gourment Explorer", icon: <PiHamburgerBold size={22} color="#000000" /> },
-    { id: 3, name: "Photo Booth", points: 30, badgeName: "Memorable Moment", icon: <MdOutlineAddAPhoto size={22} color="#000000" /> },
-    { id: 4, name: "Feature Stations", points: 30, badgeName: "Community Champion", icon: <TiStarburstOutline size={22} color="#000000" /> },
-    { id: 5, name: "Photo at LED Screen", points: 30, badgeName: "Bright Lights", icon: <MdScreenshotMonitor size={22} color="#000000" /> },
-    { id: 6, name: "Say Hi to the DJ", points: 30, badgeName: "Music Lover", icon: <IoMdMusicalNote size={22} color="#000000" /> },
-];
 export default function ActivityScreen ({ route }) {
+    const [userName, setUserName] = useState('');
     const [activities, setActivities] = useState([])
     const [camerVisible, setCameraVisible] = useState(false);
     const [completedActivityId, setCompletedActivityId] = useState(null);
     const [totalPoints, setTotalPoints] = useState(0);
     const [totalBadges, setTotalBadges] = useState(0);
+    const [unconfirmedCount, setUnconfirmedCount] = useState(0);
+    const [totalPossiblePoints, setTotalPossiblePoints] = useState(0);
     const [isModalVisible, setModalVisible] = useState(false);
     const navigation = useNavigation();
 
     useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userData = await AsyncStorage.getItem('userData');
+                if (userData) {
+                    const { first_name } = JSON.parse(userData);
+                    setUserName(first_name);
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+    useEffect(() => {
         const fetchActivities = async () => {
             try {
-                const response  = await fetch('http://app.engageathon.com/api/events/activity/86/');
-                const data = await response.json();
-                setActivities(data.activities);
+                const token = await AsyncStorage.getItem('authToken');
+                if (!token) {
+                    console.error('No token found');
+                    return;
+                }
 
-                setTotalPoints(data.accmulated_points);
-                setTotalBadges(data.confirmed_count);
+                const response = await fetch('http://app.engageathon.com/api/events/activity/86/', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Token ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const data = await response.json();
+                setActivities(data.activities || []);
+                setTotalPoints(data.accmulated_points || 0);
+                setTotalBadges(data.confirmed_count || 0);
+                setUnconfirmedCount(data.unconfirmed_count || 0);
+                setTotalPossiblePoints(data.total_possible_points || 0);
             } catch (error) {
                 console.error('Error fetching activities', error);
             }
@@ -48,18 +74,57 @@ export default function ActivityScreen ({ route }) {
         if (route.params && route.params.completedActivityId) {
             setCompletedActivityId(route.params.completedActivityId);
             const completedActivity = activities.find(activity => activity.id === route.params.completedActivityId);
-            if (completedActivity) {
-                setTotalPoints(prevPoints => prevPoints + completedActivity.points);
+            if (completedActivity && !completedActivity.confirmed) {
+                setTotalPoints(prevPoints => prevPoints + completedActivity.activity_points);
                 setTotalBadges(prevBadges => prevBadges + 1);
+
+                const updatedActivities = activities.map(activity =>
+                    activity.id === completedActivity.id ? { ...activity, confirmed: true } : activity
+                );
+                setActivities(updatedActivities);
+                setCompletedActivityId(completedActivityId);
             }
         }
     }, [route.params, activities]);
 
+    useEffect(() => {
+        if (totalBadges === 9) {
+            setModalVisible(true);
+        }
+    }, [totalBadges]);
+
+    const handleContinue = () => {
+        navigation.navigate("CollectRewardsScreen");
+        setModalVisible(false);
+    };
+{/*
     const handleActivityPress = (activity) => {
-        navigation.navigate('CongratsScreen', {
-            activityId: activity.id,
-            badgeName: activity.badgeName,
-        });
+        setCameraVisible(true);
+        setCompletedActivityId(activity.id);
+    };
+*/}
+
+    const handleActivityPress = (activity) => {
+        if (!activity.confirmed) {
+            navigation.navigate('CongratsScreen', {
+                activityId: activity.id,
+                // badgeName: activity.badgeName,
+            });
+        } else {
+            // Optionally show a message or perform other actions if the activity is already confirmed
+            Alert.alert('Already Completed', 'This activity has already been completed.');
+        }
+    };
+
+    const handleQRCodeScanned = () => {
+        setCameraVisible(false); 
+        const completedActivity = activities.find(activity => activity.id === completedActivityId);
+        if (completedActivity) {
+            navigation.navigate('CongratsScreen', {
+                activityId: completedActivity.id,
+                badgeName: completedActivity.badgeName,
+            });
+        }
     };
  
     return (
@@ -70,13 +135,13 @@ export default function ActivityScreen ({ route }) {
             />
             <View style={styles.scrollContent}>
                 <View style={styles.titleContainer}>
-                    <Text style={styles.userName}>Hi</Text>
+                    <Text style={styles.userName}>Hi, {userName}</Text>
                     <Text style={styles.scanQRText}>Scan the QR code at each station to earn points and badges</Text>
                 </View>
                 
                 <Text style={styles.activitiesText}>Activities</Text>
                 <View style={styles.activityArea}>
-                    {activities.map((activity, index) => (
+                    {activities.map((activity) => (
                         <TouchableOpacity 
                             key={activity.id} 
                             style={styles.activityContainer}
@@ -89,17 +154,22 @@ export default function ActivityScreen ({ route }) {
                                     end={{ x: 1, y: 0 }}
                                     style={styles.linearGradientBackground}
                                 >
-                                    {activity.icon}
+                                    {activity.activity_name === "Beverage Station" && <MdOutlineWineBar size={22} color="#000000" />}
+                                    {activity.activity_name === "Food Station" && <PiHamburgerBold size={22} color="#000000" />}
+                                    {activity.activity_name === "Photo Booth" && <MdOutlineAddAPhoto size={22} color="#000000" />}
+                                    {activity.activity_name === "Feature Station" && <TiStarburstOutline size={22} color="#000000" />}
+                                    {activity.activity_name === "Photo at LED Screen" && <MdScreenshotMonitor size={22} color="#000000" />}
+                                    {activity.activity_name === "Say Hi to the DJ" && <IoMdMusicalNote size={22} color="#000000" />}
                                 </LinearGradient>
-                                {completedActivityId === activity.id ? (
+                                {activity.confirmed ? (
                                     <TbRosetteDiscountCheckFilled size={28} color="#32a852" style={styles.arrowIcon} />
                                 ) : (
                                     <FaArrowRight size={20} color="#FFFFFF" style={styles.arrowIcon} />
                                 )}
 
                             </View>
-                            <Text style={styles.activityNameText}>{activity.name}</Text>
-                            <Text style={styles.pointText}>{activity.points} Points</Text>
+                            <Text style={styles.activityNameText}>{activity.activity_name}</Text>
+                            <Text style={styles.pointText}>{activity.activity_points} Points</Text>
                         </TouchableOpacity>
                     ))}
                 </View>   
@@ -112,7 +182,7 @@ export default function ActivityScreen ({ route }) {
                         />
                         <View style={styles.pointsContainer}>
                             <Text style={styles.getPoints}>{totalPoints}</Text>
-                            <Text style={styles.totalPoint}>of 180 Points</Text>
+                            <Text style={styles.totalPoint}>of {totalPossiblePoints} Points</Text>
                         </View>
                     </View>     
                     <View style={styles.rewardsContainer}>
@@ -122,11 +192,24 @@ export default function ActivityScreen ({ route }) {
                         />
                         <View style={styles.pointsContainer}>
                             <Text style={styles.getPoints}>{totalBadges}</Text>
-                            <Text style={styles.totalPoint}>of 6 Badges</Text>
+                            <Text style={styles.totalPoint}>of {unconfirmedCount} Badges</Text>
                         </View>
                     </View>      
                 </View>  
             </View>
+            <Modal 
+                visible={isModalVisible} 
+                transparent={true}
+                animationType="slide"
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Congratulations!</Text>
+                        <Text style={styles.modalMessage}>You have completed all the activities!</Text>
+                        <MainButton title="Continue" onPress={handleContinue} />
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -138,7 +221,7 @@ const styles = StyleSheet.create({
     scrollContent: {
         height: '100vh',
         overflowY: 'scroll',
-        paddingBottom: 0,
+        paddingBottom: 20,
     },
     titleContainer: {
         paddingHorizontal: 30,
@@ -232,5 +315,30 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: '#ABABAB',
         lineHeight: 18,
-    }
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        width: '85%',
+        paddingVertical: 40,
+        paddingHorizontal: 20,
+        backgroundColor: '#393939',
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    modalTitle: {
+        fontSize: 24,
+        color: '#FFFFFF',
+    },
+    modalMessage: {
+        fontSize: 18,
+        marginTop: 10,
+        marginBottom: 30,
+        color: '#F1ECE6',
+    },
+
 })

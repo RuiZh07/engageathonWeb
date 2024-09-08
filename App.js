@@ -9,6 +9,7 @@ import UserForm from './src/screens/UserForm';
 import ActivityScreen from './src/screens/ActivityScreen';
 import Login from "./src/screens/Login";
 import CongratsScreen from './src/screens/CongratsScreen';
+import CollectRewardsScreen from './src/screens/CollectRewardsScreen';
 
 const Stack = createStackNavigator();
 
@@ -22,6 +23,7 @@ export default function App() {
         <Stack.Screen name="ActivityScreen" component={ActivityScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
         <Stack.Screen name="CongratsScreen" component={CongratsScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="CollectRewardsScreen" component={CollectRewardsScreen} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
