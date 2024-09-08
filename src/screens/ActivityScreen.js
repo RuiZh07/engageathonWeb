@@ -20,7 +20,7 @@ const activities = [
     { id: 6, name: "Say Hi to the DJ", points: 30, badgeName: "Music Lover", icon: <IoMdMusicalNote size={22} color="#000000" /> },
 ];
 export default function ActivityScreen ({ route }) {
-    const [activities, setActivities] = useState([])
+    //const [activities, setActivities] = useState([])
     const [camerVisible, setCameraVisible] = useState(false);
     const [completedActivityId, setCompletedActivityId] = useState(null);
     const [totalPoints, setTotalPoints] = useState(0);
