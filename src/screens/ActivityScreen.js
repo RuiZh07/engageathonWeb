@@ -77,56 +77,56 @@ export default function ActivityScreen ({ route }) {
                 <Text style={styles.activitiesText}>Activities</Text>
                 <View style={styles.activityArea}>
                     {activities.map((activity, index) => (
-                    <TouchableOpacity 
-                        key={activity.id} 
-                        style={styles.activityContainer}
-                        onPress={() => handleActivityPress(activity)}
-                    >
-                        <View style={styles.iconsContainer}>
-                            <LinearGradient
-                                colors={["#FF8D00", "#FFDE1A"]}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                                style={styles.linearGradientBackground}
-                            >
-                                {activity.icon}
-                            </LinearGradient>
-                            {completedActivityId === activity.id ? (
-                                <TbRosetteDiscountCheckFilled size={28} color="#32a852" style={styles.arrowIcon} />
-                            ) : (
-                                <FaArrowRight size={20} color="#FFFFFF" style={styles.arrowIcon} />
-                            )}
+                        <TouchableOpacity 
+                            key={activity.id} 
+                            style={styles.activityContainer}
+                            onPress={() => handleActivityPress(activity)}
+                        >
+                            <View style={styles.iconsContainer}>
+                                <LinearGradient
+                                    colors={["#FF8D00", "#FFDE1A"]}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={styles.linearGradientBackground}
+                                >
+                                    {activity.icon}
+                                </LinearGradient>
+                                {completedActivityId === activity.id ? (
+                                    <TbRosetteDiscountCheckFilled size={28} color="#32a852" style={styles.arrowIcon} />
+                                ) : (
+                                    <FaArrowRight size={20} color="#FFFFFF" style={styles.arrowIcon} />
+                                )}
 
-                        </View>
-                        <Text style={styles.activityNameText}>{activity.name}</Text>
-                        <Text style={styles.pointText}>{activity.points} Points</Text>
-                    </TouchableOpacity>
+                            </View>
+                            <Text style={styles.activityNameText}>{activity.name}</Text>
+                            <Text style={styles.pointText}>{activity.points} Points</Text>
+                        </TouchableOpacity>
                     ))}
                 </View>   
                 <Text style={styles.rewardsEarnedText}>Rewards Earned</Text> 
                 <View style={styles.rewardArea}>  
-                <View style={styles.rewardsContainer}>
-                    <Image 
-                        source={require('../../assets/prizes/star-badge.png')} 
-                        style={{ width: 40, height: 40 }}
-                    />
-                    <View style={styles.pointsContainer}>
-                        <Text style={styles.getPoints}>{totalPoints}</Text>
-                        <Text style={styles.totalPoint}>of 180 Points</Text>
-                    </View>
-                </View>     
-                <View style={styles.rewardsContainer}>
-                    <Image 
-                        source={require('../../assets/prizes/prize.png')} 
-                        style={{ width: 30, height: 40 }}
-                    />
-                    <View style={styles.pointsContainer}>
-                    <Text style={styles.getPoints}>{totalBadges}</Text>
-                    <Text style={styles.totalPoint}>of 6 Badges</Text>
-                    </View>
-                </View>      
+                    <View style={styles.rewardsContainer}>
+                        <Image 
+                            source={require('../../assets/prizes/star-badge.png')} 
+                            style={{ width: 40, height: 40 }}
+                        />
+                        <View style={styles.pointsContainer}>
+                            <Text style={styles.getPoints}>{totalPoints}</Text>
+                            <Text style={styles.totalPoint}>of 180 Points</Text>
+                        </View>
+                    </View>     
+                    <View style={styles.rewardsContainer}>
+                        <Image 
+                            source={require('../../assets/prizes/prize.png')} 
+                            style={{ width: 30, height: 40 }}
+                        />
+                        <View style={styles.pointsContainer}>
+                            <Text style={styles.getPoints}>{totalBadges}</Text>
+                            <Text style={styles.totalPoint}>of 6 Badges</Text>
+                        </View>
+                    </View>      
                 </View>  
-                </View>
+            </View>
         </View>
     );
 }
@@ -205,10 +205,10 @@ const styles = StyleSheet.create({
         color: '#FFE600',
     },
     rewardArea: {
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            padding: 20,
-            justifyContent: 'space-between',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        padding: 20,
+        justifyContent: 'space-between',
     },
     rewardsContainer: {
         width: '48%',
@@ -232,7 +232,5 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: '#ABABAB',
         lineHeight: 18,
-    },
-
-
+    }
 })
