@@ -27,7 +27,7 @@ export default function ActivityScreen ({ route }) {
     const [totalBadges, setTotalBadges] = useState(0);
     const [isModalVisible, setModalVisible] = useState(false);
     const navigation = useNavigation();
-
+    {/*
     useEffect(() => {
         const fetchActivities = async () => {
             try {
@@ -43,7 +43,7 @@ export default function ActivityScreen ({ route }) {
         };
         fetchActivities();
     }, [])
-
+    */}
     useEffect(() => {
         if (route.params && route.params.completedActivityId) {
             setCompletedActivityId(route.params.completedActivityId);
