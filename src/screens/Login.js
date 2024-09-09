@@ -139,13 +139,14 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         height: '100vh',
+        paddingBottom: 10,  
+        flexGrow: 1,        
         overflowY: 'scroll',
-        paddingBottom: 0,
     },
     loginContainer: {
-        flex: 1,
+        flexGrow: 1,
         backgroundColor: "#393939",
-        height: "70%",
+        height: "85%",
         paddingTop: "12%",
         paddingBottom: "7%",
         paddingHorizontal: '10%',
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
     },
     subHeading: {
         paddingTop: 10,
-        paddingBottom: 50,
+        paddingBottom: 40,
         color: "#FFFFFF",
         fontFamily: "Poppins",
         fontSize: 20,
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
     }, 
     signUpContainer: {
         flexDirection: 'row',
-        marginTop: 80,
+        marginTop: 60,
         justifyContent: 'center',
     },
     accountText: {

@@ -113,6 +113,7 @@ export default function ActivityScreen ({ route }) {
                 // badgeName: activity.badgeName,
             });
             
+            
         } else {
             Alert.alert('Already Completed', 'This activity has already been completed.');
         }
@@ -177,7 +178,7 @@ export default function ActivityScreen ({ route }) {
                             <Text style={styles.totalPoint}>of {totalPossiblePoints} Points</Text>
                         </View>
                     </View> 
-                        
+
                     <View style={styles.rewardsContainer}>
                         <Image 
                             source={require('../../assets/prizes/prize.png')} 
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     scrollContent: {
         height: '100vh',
         overflowY: 'scroll',
-        paddingBottom: 20,
+        paddingBottom: 70,
     },
     titleContainer: {
         paddingHorizontal: 30,

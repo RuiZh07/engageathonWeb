@@ -73,6 +73,7 @@ export default function UserForm() {
                 source={require("../../assets/backgroundImage.png")}
                 style={{ width: "100%", height: "100%", position: "absolute" }}
             />
+             <View style={styles.scrollContent}>
                 <IconTitle />
 
                 <View style={styles.enterTextContainer}>
@@ -134,16 +135,17 @@ export default function UserForm() {
                     </View>
                 </LinearGradient>
             </View>
-
-            <View style={styles.buttonContainer}>
-                <MainButton title="Continue" onPress={handleContinue} />
-            </View>
-
             {errorMessage ? (
                 <View style={styles.errorContainer}>
                     <Text style={styles.errorText}>{errorMessage}</Text>
                 </View>
             ) : null}
+            
+            <View style={styles.buttonContainer}>
+                <MainButton title="Continue" onPress={handleContinue} />
+            </View>
+
+            </View>
         </View>
     );
 }
@@ -151,6 +153,12 @@ export default function UserForm() {
 const styles = StyleSheet.create({
     container:{
         flex: 1,
+    },
+    scrollContent: {
+        height: '100vh',
+        paddingBottom: 90,  
+        flexGrow: 1,        
+        overflowY: 'scroll',
     },
     enterTextContainer: {
         justifyContent: "center",
